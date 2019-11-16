@@ -7,7 +7,7 @@ resource "azurerm_iothub" "iothub" {
   name                = "eventiothub"
   resource_group_name = azurerm_resource_group.rg.name
   location            = azurerm_resource_group.rg.location
-  namespace = "TFM"
+  #namespace = "TFM"
 
   sku {
     name     = "F1"
@@ -17,7 +17,7 @@ resource "azurerm_iothub" "iothub" {
 
   endpoint {
     type                       = "AzureIotHub.StorageContainer"
-    connection_string          = "${azurerm_storage_account.sa.primary_blob_connection_string}"
+    connection_string          = azurerm_storage_account.sa.primary_blob_connection_string
     name                       = "export"
     batch_frequency_in_seconds = 60
     max_chunk_size_in_bytes    = 10485760
@@ -36,8 +36,8 @@ resource "azurerm_iothub" "iothub" {
 
 resource "azurerm_storage_account" "sa" {
   name                     = "prodsa"
-  resource_group_name      = "${azurerm_resource_group.rg.name}"
-  location                 = "${azurerm_resource_group.rg.location}"
+  resource_group_name      = azurerm_resource_group.rg.name
+  location                 = azurerm_resource_group.rg.location
   account_tier             = "Standard"
   account_replication_type = "LRS"
   #primary_key = "kXp2s5v8y/B?E(G+KbPeShVmYq3t6w9z$C&F)J@McQfTjWnZr4u7x!A%D*G-KaPd"
@@ -45,29 +45,29 @@ resource "azurerm_storage_account" "sa" {
 
 resource "azurerm_storage_container" "ev" {
   name                  = "events"
-  resource_group_name   = "${azurerm_resource_group.rg.name}"
-  storage_account_name  = "${azurerm_storage_account.sa.name}"
+  resource_group_name   = azurerm_resource_group.rg.name
+  storage_account_name  = azurerm_storage_account.sa.name
   container_access_type = "private"
 }
 
 resource "azurerm_storage_container" "prod" {
   name                  = "prod"
-  resource_group_name   = "${azurerm_resource_group.rg.name}"
-  storage_account_name  = "${azurerm_storage_account.sa.name}"
+  resource_group_name   = azurerm_resource_group.rg.name
+  storage_account_name  = azurerm_storage_account.sa.name
   container_access_type = "private"
 }
 
 resource "azurerm_storage_container" "dev" {
   name                  = "dev"
-  resource_group_name   = "${azurerm_resource_group.rg.name}"
-  storage_account_name  = "${azurerm_storage_account.sa.name}"
+  resource_group_name   = azurerm_resource_group.rg.name
+  storage_account_name  = azurerm_storage_account.sa.name
   container_access_type = "private"
 }
 
 resource "azurerm_stream_analytics_job" "asa" {
   name                                     = "prodASA"
-  resource_group_name                      = "${azurerm_resource_group.rg.name}"
-  location                                 = "${azurerm_resource_group.rg.location}"
+  resource_group_name                      = azurerm_resource_group.rg.name
+  location                                 = azurerm_resource_group.rg.location
   compatibility_level                      = "1.1"
   data_locale                              = "en-GB"
   events_late_arrival_max_delay_in_seconds = 60
@@ -87,12 +87,12 @@ QUERY
 
 resource "azurerm_stream_analytics_stream_input_iothub" "prodiothub" {
   name                         = "iothub"
-  stream_analytics_job_name    = "${azurerm_stream_analytics_job.asa.name}"
-  resource_group_name          = "${azurerm_resource_group.rg.name}"
+  stream_analytics_job_name    = azurerm_stream_analytics_job.asa.name
+  resource_group_name          = azurerm_resource_group.rg.name
   endpoint                     = "messages/events"
   eventhub_consumer_group_name = "$Default"
-  iothub_namespace             = "${azurerm_iothub.iothub.namespace}"
-  shared_access_policy_key     = "${azurerm_iothub.iothub.shared_access_policy.0.primary_key}"
+  iothub_namespace             = azurerm_iothub.iothub.name
+  shared_access_policy_key     = azurerm_iothub.iothub.shared_access_policy.0.primary_key
   shared_access_policy_name    = "iothubowner"
 
   serialization {
@@ -103,11 +103,11 @@ resource "azurerm_stream_analytics_stream_input_iothub" "prodiothub" {
 
 resource "azurerm_stream_analytics_output_blob" "prodbs" {
   name                      = "blobstorage"
-  stream_analytics_job_name = "${azurerm_stream_analytics_job.asa.name}"
-  resource_group_name       = "${azurerm_resource_group.rg.name}"
-  storage_account_name      = "${azurerm_storage_account.sa.name}"
+  stream_analytics_job_name = azurerm_stream_analytics_job.asa.name
+  resource_group_name       = azurerm_resource_group.rg.name
+  storage_account_name      = azurerm_storage_account.sa.name
   #storage_account_key       = "${azurerm_storage_account.sa.primary_key}"
-  storage_container_name    = "${azurerm_storage_container.prod.name}"
+  storage_container_name    = azurerm_storage_container.prod.name
   path_pattern              = "some-pattern"
   date_format               = "yyyy-MM-dd"
   time_format               = "HH"
@@ -121,8 +121,8 @@ resource "azurerm_stream_analytics_output_blob" "prodbs" {
 
 resource "azurerm_stream_analytics_job" "asa2" {
   name                                     = "devASA"
-  resource_group_name                      = "${azurerm_resource_group.rg.name}"
-  location                                 = "${azurerm_resource_group.rg.location}"
+  resource_group_name                      = azurerm_resource_group.rg.name
+  location                                 = azurerm_resource_group.rg.location
   compatibility_level                      = "1.1"
   data_locale                              = "en-GB"
   events_late_arrival_max_delay_in_seconds = 60
@@ -142,12 +142,12 @@ QUERY
 
 resource "azurerm_stream_analytics_stream_input_iothub" "deviothub" {
   name                         = "iothub"
-  stream_analytics_job_name    = "${azurerm_stream_analytics_job.asa2.name}"
-  resource_group_name          = "${azurerm_resource_group.rg.name}"
+  stream_analytics_job_name    = azurerm_stream_analytics_job.asa2.name
+  resource_group_name          = azurerm_resource_group.rg.name
   endpoint                     = "messages/events"
   eventhub_consumer_group_name = "$Default"
-  iothub_namespace             = "${azurerm_iothub.iothub.iothub_namespace}"
-  shared_access_policy_key     = "${azurerm_iothub.iothub.shared_access_policy.0.primary_key}"
+  iothub_namespace             = azurerm_iothub.iothub.iothub_namespace
+  shared_access_policy_key     = azurerm_iothub.iothub.shared_access_policy.0.primary_key
   shared_access_policy_name    = "iothubowner"
 
   serialization {
@@ -158,11 +158,11 @@ resource "azurerm_stream_analytics_stream_input_iothub" "deviothub" {
 
 resource "azurerm_stream_analytics_output_blob" "devbs" {
   name                      = "blobstorage"
-  stream_analytics_job_name = "${azurerm_stream_analytics_job.asa2.name}"
-  resource_group_name       = "${azurerm_resource_group.rg.name}"
-  storage_account_name      = "${azurerm_storage_account.sa.name}"
+  stream_analytics_job_name = azurerm_stream_analytics_job.asa2.name
+  resource_group_name       = azurerm_resource_group.rg.name
+  storage_account_name      = azurerm_storage_account.sa.name
   storage_account_key       = ""
-  storage_container_name    = "${azurerm_storage_container.dev.name}"
+  storage_container_name    = azurerm_storage_container.dev.name
   path_pattern              = "some-pattern"
   date_format               = "yyyy-MM-dd"
   time_format               = "HH"
