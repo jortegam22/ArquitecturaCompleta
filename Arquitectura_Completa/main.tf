@@ -21,7 +21,7 @@ resource "azurerm_iothub" "iothub" {
     name                       = "export"
     batch_frequency_in_seconds = 60
     max_chunk_size_in_bytes    = 10485760
-    container_name             = azurerm_storage_account.ev.name
+    container_name             = azurerm_storage_container.ev.name
     encoding                   = "Avro"
     file_name_format           = "{iothub}/{partition}_{YYYY}_{MM}_{DD}_{HH}_{mm}"
   }
