@@ -7,6 +7,7 @@ resource "azurerm_iothub" "iothub" {
   name                = "eventiothub"
   resource_group_name = "${azurerm_resource_group.rg.name}"
   location            = "${azurerm_resource_group.rg.location}"
+  namespace = "TFM"
 
   sku {
     name     = "F1"
@@ -24,6 +25,13 @@ resource "azurerm_iothub" "iothub" {
     encoding                   = "Avro"
     file_name_format           = "{iothub}/{partition}_{YYYY}_{MM}_{DD}_{HH}_{mm}"
   }
+  shared_access_policy{
+    key_name = "hola"
+    primary_key = ")H@MbQeThWmZq4t7w!z%C*F-JaNdRfUjXn2r5u8x/A?D(G+KbPeShVkYp3s6v9y$"
+    secondary_key = "8x/A?D(G+KaPdSgVkYp3s6v9y$B&E)H@McQeThWmZq4t7w!z%C*F-JaNdRgUjXn2"
+    permissions = "iothubowner"
+
+  }
 }
 
 resource "azurerm_storage_account" "sa" {
@@ -32,6 +40,7 @@ resource "azurerm_storage_account" "sa" {
   location                 = "${azurerm_resource_group.rg.location}"
   account_tier             = "Standard"
   account_replication_type = "LRS"
+  primary_access_key = "kXp2s5v8y/B?E(G+KbPeShVmYq3t6w9z$C&F)J@McQfTjWnZr4u7x!A%D*G-KaPd"
 }
 
 resource "azurerm_storage_container" "ev" {
@@ -82,7 +91,7 @@ resource "azurerm_stream_analytics_stream_input_iothub" "prodiothub" {
   resource_group_name          = "${azurerm_resource_group.rg.name}"
   endpoint                     = "messages/events"
   eventhub_consumer_group_name = "$Default"
-  iothub_namespace             = "${azurerm_iothub.iothub.iothub_namespace}"
+  iothub_namespace             = "${azurerm_iothub.iothub.namespace}"
   shared_access_policy_key     = "${azurerm_iothub.iothub.shared_access_policy.0.primary_key}"
   shared_access_policy_name    = "iothubowner"
 
@@ -97,7 +106,7 @@ resource "azurerm_stream_analytics_output_blob" "prodbs" {
   stream_analytics_job_name = "${azurerm_stream_analytics_job.asa.name}"
   resource_group_name       = "${azurerm_resource_group.rg.name}"
   storage_account_name      = "${azurerm_storage_account.sa.name}"
-  storage_account_key       = "${azurerm_storage_account.sa.primary_key}"
+  storage_account_key       = "${azurerm_storage_account.sa.primary_access_key}"
   storage_container_name    = "${azurerm_storage_container.prod.name}"
   path_pattern              = "some-pattern"
   date_format               = "yyyy-MM-dd"
