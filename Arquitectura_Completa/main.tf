@@ -25,13 +25,13 @@ resource "azurerm_iothub" "iothub" {
     encoding                   = "Avro"
     file_name_format           = "{iothub}/{partition}_{YYYY}_{MM}_{DD}_{HH}_{mm}"
   }
-  shared_access_policy{
+  /*shared_access_policy{
     key_name = "hola"
     primary_key = ")H@MbQeThWmZq4t7w!z%C*F-JaNdRfUjXn2r5u8x/A?D(G+KbPeShVkYp3s6v9y$"
     secondary_key = "8x/A?D(G+KaPdSgVkYp3s6v9y$B&E)H@McQeThWmZq4t7w!z%C*F-JaNdRgUjXn2"
     permissions = "iothubowner"
 
-  }
+  }*/
 }
 
 resource "azurerm_storage_account" "sa" {
@@ -45,21 +45,18 @@ resource "azurerm_storage_account" "sa" {
 
 resource "azurerm_storage_container" "ev" {
   name                  = "events"
-  resource_group_name   = azurerm_resource_group.rg.name
   storage_account_name  = azurerm_storage_account.sa.name
   container_access_type = "private"
 }
 
 resource "azurerm_storage_container" "prod" {
   name                  = "prod"
-  resource_group_name   = azurerm_resource_group.rg.name
   storage_account_name  = azurerm_storage_account.sa.name
   container_access_type = "private"
 }
 
 resource "azurerm_storage_container" "dev" {
   name                  = "dev"
-  resource_group_name   = azurerm_resource_group.rg.name
   storage_account_name  = azurerm_storage_account.sa.name
   container_access_type = "private"
 }
@@ -92,7 +89,7 @@ resource "azurerm_stream_analytics_stream_input_iothub" "prodiothub" {
   endpoint                     = "messages/events"
   eventhub_consumer_group_name = "$Default"
   iothub_namespace             = azurerm_iothub.iothub.name
-  shared_access_policy_key     = azurerm_iothub.iothub.shared_access_policy.0.primary_key
+  #shared_access_policy_key     = azurerm_iothub.iothub.shared_access_policy.0.primary_key
   shared_access_policy_name    = "iothubowner"
 
   serialization {
@@ -147,7 +144,7 @@ resource "azurerm_stream_analytics_stream_input_iothub" "deviothub" {
   endpoint                     = "messages/events"
   eventhub_consumer_group_name = "$Default"
   iothub_namespace             = azurerm_iothub.iothub.iothub_namespace
-  shared_access_policy_key     = azurerm_iothub.iothub.shared_access_policy.0.primary_key
+  #shared_access_policy_key     = azurerm_iothub.iothub.shared_access_policy.0.primary_key
   shared_access_policy_name    = "iothubowner"
 
   serialization {
