@@ -40,7 +40,7 @@ resource "azurerm_storage_account" "sa" {
   location                 = azurerm_resource_group.rg.location
   account_tier             = "Standard"
   account_replication_type = "LRS"
-  #primary_key = "kXp2s5v8y/B?E(G+KbPeShVmYq3t6w9z$C&F)J@McQfTjWnZr4u7x!A%D*G-KaPd"
+  primary_access_key = "kXp2s5v8y/B?E(G+KbPeShVmYq3t6w9z$C&F)J@McQfTjWnZr4u7x!A%D*G-KaPd"
 }
 
 resource "azurerm_storage_container" "ev" {
@@ -89,7 +89,7 @@ resource "azurerm_stream_analytics_stream_input_iothub" "prodiothub" {
   endpoint                     = "messages/events"
   eventhub_consumer_group_name = "$Default"
   iothub_namespace             = azurerm_iothub.iothub.name
-  shared_access_policy_key     = azurerm_iothub.iothub.shared_access_policy_key
+  shared_access_policy_key     = azurerm_iothub.iothub.shared_access_policy.0.primary_key
   shared_access_policy_name    = "iothubowner"
 
   serialization {
@@ -103,7 +103,7 @@ resource "azurerm_stream_analytics_output_blob" "prodbs" {
   stream_analytics_job_name = azurerm_stream_analytics_job.asa.name
   resource_group_name       = azurerm_resource_group.rg.name
   storage_account_name      = azurerm_storage_account.sa.name
-  #storage_account_key       = "${azurerm_storage_account.sa.primary_key}"
+  storage_account_key       = azurerm_storage_account.sa.primary_access_key
   storage_container_name    = azurerm_storage_container.prod.name
   path_pattern              = "some-pattern"
   date_format               = "yyyy-MM-dd"
@@ -144,7 +144,7 @@ resource "azurerm_stream_analytics_stream_input_iothub" "deviothub" {
   endpoint                     = "messages/events"
   eventhub_consumer_group_name = "$Default"
   iothub_namespace             = azurerm_iothub.iothub.name
-  #shared_access_policy_key     = azurerm_iothub.iothub.shared_access_policy.0.primary_key
+  shared_access_policy_key     = azurerm_iothub.iothub.shared_access_policy.0.primary_key
   shared_access_policy_name    = "iothubowner"
 
   serialization {
@@ -158,7 +158,7 @@ resource "azurerm_stream_analytics_output_blob" "devbs" {
   stream_analytics_job_name = azurerm_stream_analytics_job.asa2.name
   resource_group_name       = azurerm_resource_group.rg.name
   storage_account_name      = azurerm_storage_account.sa.name
-  #storage_account_key       = ""
+  storage_account_key       = azurerm_storage_account.sa.primary_access_key
   storage_container_name    = azurerm_storage_container.dev.name
   path_pattern              = "some-pattern"
   date_format               = "yyyy-MM-dd"
