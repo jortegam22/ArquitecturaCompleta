@@ -1,12 +1,12 @@
 resource "azurerm_resource_group" "rg" {
-  name     = "${var.resource_group_name}"
-  location = "${var.resource_group_location}"
+  name     = var.resource_group_name
+  location = var.resource_group_location
 }
 
 resource "azurerm_iothub" "iothub" {
   name                = "eventiothub"
-  resource_group_name = "${azurerm_resource_group.rg.name}"
-  location            = "${azurerm_resource_group.rg.location}"
+  resource_group_name = azurerm_resource_group.rg.name
+  location            = azurerm_resource_group.rg.location
   namespace = "TFM"
 
   sku {
@@ -40,7 +40,7 @@ resource "azurerm_storage_account" "sa" {
   location                 = "${azurerm_resource_group.rg.location}"
   account_tier             = "Standard"
   account_replication_type = "LRS"
-  primary_key = "kXp2s5v8y/B?E(G+KbPeShVmYq3t6w9z$C&F)J@McQfTjWnZr4u7x!A%D*G-KaPd"
+  #primary_key = "kXp2s5v8y/B?E(G+KbPeShVmYq3t6w9z$C&F)J@McQfTjWnZr4u7x!A%D*G-KaPd"
 }
 
 resource "azurerm_storage_container" "ev" {
@@ -106,7 +106,7 @@ resource "azurerm_stream_analytics_output_blob" "prodbs" {
   stream_analytics_job_name = "${azurerm_stream_analytics_job.asa.name}"
   resource_group_name       = "${azurerm_resource_group.rg.name}"
   storage_account_name      = "${azurerm_storage_account.sa.name}"
-  storage_account_key       = "${azurerm_storage_account.sa.primary_key}"
+  #storage_account_key       = "${azurerm_storage_account.sa.primary_key}"
   storage_container_name    = "${azurerm_storage_container.prod.name}"
   path_pattern              = "some-pattern"
   date_format               = "yyyy-MM-dd"
