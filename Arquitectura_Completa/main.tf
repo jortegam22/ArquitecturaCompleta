@@ -40,7 +40,7 @@ resource "azurerm_storage_account" "sa" {
   location                 = azurerm_resource_group.rg.location
   account_tier             = "Standard"
   account_replication_type = "LRS"
-  primary_access_key = azurerm_storage_account.primary_key
+  #primary_access_key = azurerm_storage_account.primary_key
 }
 
 resource "azurerm_storage_container" "ev" {
