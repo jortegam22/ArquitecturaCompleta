@@ -1,1 +1,8 @@
-azurerm_resource_group = "Produccion"
+variable "resource_group_name" {
+  default = "Produccion"
+}
+
+variable "resource_group_location" {
+  default = "West Europe"
+}
+
