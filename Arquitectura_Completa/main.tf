@@ -13,17 +13,20 @@ resource "azurerm_iothub" "iothub" {
     tier     = "Standard"
     capacity = "1"
   }
+}
 
-  endpoint {
-    type                       = "AzureIotHub.StorageContainer"
-    connection_string          = azurerm_storage_account.sa.primary_blob_connection_string
-    name                       = "export"
-    batch_frequency_in_seconds = 60
-    max_chunk_size_in_bytes    = 10485760
-    container_name             = azurerm_storage_container.ev.name
-    encoding                   = "Avro"
-    file_name_format           = "{iothub}/{partition}_{YYYY}_{MM}_{DD}_{HH}_{mm}"
-  }
+resource "azurerm_iothub_endpoint_storage_container" "ihe" {
+  resource_group_name = azurerm_resource_group.example.name
+  iothub_name         = azurerm_iothub.example.name
+  name                = "events"
+
+  container_name    = azurerm_storage_container.ev.name 
+  connection_string = azurerm_storage_account.sa.primary_blob_connection_string
+
+  file_name_format           = "{iothub}/{partition}_{YYYY}_{MM}_{DD}_{HH}_{mm}"
+  batch_frequency_in_seconds = 60
+  max_chunk_size_in_bytes    = 10485760
+  encoding                   = "JSON"
 }
 
 resource "azurerm_storage_account" "sa" {
