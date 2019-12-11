@@ -37,19 +37,19 @@ resource "azurerm_storage_account" "sa" {
 resource "azurerm_storage_container" "ev" {
   name                  = "eventos"
   storage_account_name  = azurerm_storage_account.sa.name
-  container_access_type = "private"
+  container_access_type = "container"
 }
 
 resource "azurerm_storage_container" "prod" {
   name                  = "prod"
   storage_account_name  = azurerm_storage_account.sa.name
-  container_access_type = "private"
+  container_access_type = "container"
 }
 
 resource "azurerm_storage_container" "dev" {
   name                  = "dev"
   storage_account_name  = azurerm_storage_account.sa.name
-  container_access_type = "private"
+  container_access_type = "container"
 }
 
 resource "azurerm_stream_analytics_job" "asa" {
