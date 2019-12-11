@@ -16,8 +16,8 @@ resource "azurerm_iothub" "iothub" {
 }
 
 resource "azurerm_iothub_endpoint_storage_container" "ihe" {
-  resource_group_name = azurerm_resource_group.example.name
-  iothub_name         = azurerm_iothub.example.name
+  resource_group_name = azurerm_resource_group.rg.name
+  iothub_name         = azurerm_iothub.iothub.name
   name                = "events"
 
   container_name    = azurerm_storage_container.ev.name 
