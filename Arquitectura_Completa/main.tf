@@ -13,6 +13,22 @@ resource "azurerm_iothub" "iothub" {
     tier     = "Standard"
     capacity = "1"
   }
+
+    route {
+    name           = "eventos"
+    source         = "DeviceMessages"
+    condition      = "true"
+    endpoint_names = ["export"]
+    enabled        = true
+  }
+
+    route {
+    name           = "asa"
+    source         = "DeviceMessages"
+    condition      = "true"
+    endpoint_names = ["events"]
+    enabled        = true
+  }
 }
 
 resource "azurerm_iothub_endpoint_storage_container" "ihe" {
@@ -28,6 +44,8 @@ resource "azurerm_iothub_endpoint_storage_container" "ihe" {
   max_chunk_size_in_bytes    = 10485760
   encoding                   = "JSON"
 }
+
+
 
 resource "azurerm_storage_account" "sa" {
   name                     = "prodsa"
@@ -68,10 +86,14 @@ resource "azurerm_stream_analytics_job" "asa" {
   streaming_units                          = 3
 
   transformation_query = <<QUERY
+  WITH Eventos AS (
     SELECT *
-    INTO [${azurerm_storage_container.prod.name}]
-    FROM [${azurerm_iothub.iothub.name}]
-    WHERE environment = true
+    FROM ${azurerm_stream_analytics_stream_input_iothub.prodiothub.name}
+  )
+    SELECT *
+    INTO ${azurerm_stream_analytics_output_blob.prodbs.name}
+    FROM Eventos
+    WHERE environment = true and eventType = 'Error'
 QUERY
 }
 
@@ -98,14 +120,15 @@ resource "azurerm_stream_analytics_output_blob" "prodbs" {
   storage_account_name      = azurerm_storage_account.sa.name
   storage_account_key       = azurerm_storage_account.sa.primary_access_key
   storage_container_name    = azurerm_storage_container.prod.name
-  path_pattern              = "some-pattern"
+  path_pattern              = "events"
   date_format               = "yyyy-MM-dd"
   time_format               = "HH"
 
   serialization {
-    type            = "Csv"
+    type            = "JSON"
     encoding        = "UTF8"
-    field_delimiter = ","
+    field_delimiter = "
+    "
   }
 }
 
@@ -121,10 +144,15 @@ resource "azurerm_stream_analytics_job" "asa2" {
   output_error_policy                      = "Drop"
   streaming_units                          = 3
 
-  transformation_query = <<QUERY
+  transformation_query = <<QUERY  
+  WITH Eventos AS (
     SELECT *
-    INTO [${azurerm_storage_container.dev.name}]
-    FROM [${azurerm_iothub.iothub.name}]
+    FROM ${azurerm_stream_analytics_stream_input_iothub.deviothub.name}
+  )
+    SELECT *
+    INTO ${azurerm_stream_analytics_output_blob.devbs.name}
+    FROM Eventos
+    WHERE environment = false and eventType = 'Error'
 QUERY
 }
 
@@ -139,7 +167,7 @@ resource "azurerm_stream_analytics_stream_input_iothub" "deviothub" {
   shared_access_policy_name    = "iothubowner"
 
   serialization {
-    type     = "Json"
+    type     = "JSON"
     encoding = "UTF8"
   }
 }
@@ -151,13 +179,14 @@ resource "azurerm_stream_analytics_output_blob" "devbs" {
   storage_account_name      = azurerm_storage_account.sa.name
   storage_account_key       = azurerm_storage_account.sa.primary_access_key
   storage_container_name    = azurerm_storage_container.dev.name
-  path_pattern              = "some-pattern"
+  path_pattern              = "events"
   date_format               = "yyyy-MM-dd"
   time_format               = "HH"
 
   serialization {
-    type            = "Csv"
+    type            = "JSON"
     encoding        = "UTF8"
-    field_delimiter = ","
+    field_delimiter = "
+    "
   }
 }
