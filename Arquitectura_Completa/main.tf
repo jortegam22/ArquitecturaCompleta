@@ -127,8 +127,7 @@ resource "azurerm_stream_analytics_output_blob" "prodbs" {
   serialization {
     type            = "JSON"
     encoding        = "UTF8"
-    field_delimiter = "
-    "
+    field_delimiter = " "
   }
 }
 
@@ -150,10 +149,10 @@ resource "azurerm_stream_analytics_job" "asa2" {
     FROM ${azurerm_stream_analytics_stream_input_iothub.deviothub.name}
   )
     SELECT *
-    INTO ${azurerm_stream_analytics_output_blob.devbs.name}
+    INTO [${azurerm_stream_analytics_output_blob.devbs.name}]
     FROM Eventos
     WHERE environment = false and eventType = 'Error'
-QUERY
+  QUERY
 }
 
 resource "azurerm_stream_analytics_stream_input_iothub" "deviothub" {
@@ -186,7 +185,6 @@ resource "azurerm_stream_analytics_output_blob" "devbs" {
   serialization {
     type            = "JSON"
     encoding        = "UTF8"
-    field_delimiter = "
-    "
+    field_delimiter = " "
   }
 }
