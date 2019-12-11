@@ -88,10 +88,10 @@ resource "azurerm_stream_analytics_job" "asa" {
   transformation_query = <<QUERY
   WITH Eventos AS (
     SELECT *
-    FROM ${azurerm_stream_analytics_stream_input_iothub.prodiothub.name}
+    FROM [${azurerm_stream_analytics_stream_input_iothub.prodiothub.name}]
   )
     SELECT *
-    INTO ${azurerm_stream_analytics_output_blob.prodbs.name}
+    INTO [${azurerm_stream_analytics_output_blob.prodbs.name}]
     FROM Eventos
     WHERE environment == true and eventType == "Error"
   QUERY
@@ -146,10 +146,10 @@ resource "azurerm_stream_analytics_job" "asa2" {
   transformation_query = <<QUERY
   WITH Eventos AS (
     SELECT *
-    FROM ${azurerm_stream_analytics_stream_input_iothub.deviothub.name}
+    FROM [${azurerm_stream_analytics_stream_input_iothub.deviothub.name}]
   )
     SELECT *
-    INTO ${azurerm_stream_analytics_output_blob.devbs.name}
+    INTO [${azurerm_stream_analytics_output_blob.devbs.name}]
     FROM Eventos
     WHERE environment == false and eventType == "Error"
   QUERY
