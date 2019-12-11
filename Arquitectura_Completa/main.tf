@@ -7,8 +7,7 @@ resource "azurerm_iothub" "iothub" {
   name                = "eventiothub"
   resource_group_name = azurerm_resource_group.rg.name
   location            = azurerm_resource_group.rg.location
-  #namespace = "TFM"
-
+  
   sku {
     name     = "F1"
     tier     = "Standard"
@@ -25,13 +24,6 @@ resource "azurerm_iothub" "iothub" {
     encoding                   = "Avro"
     file_name_format           = "{iothub}/{partition}_{YYYY}_{MM}_{DD}_{HH}_{mm}"
   }
-  /*shared_access_policy{
-    key_name = "hola"
-    primary_key = ")H@MbQeThWmZq4t7w!z%C*F-JaNdRfUjXn2r5u8x/A?D(G+KbPeShVkYp3s6v9y$"
-    secondary_key = "8x/A?D(G+KaPdSgVkYp3s6v9y$B&E)H@McQeThWmZq4t7w!z%C*F-JaNdRgUjXn2"
-    permissions = "iothubowner"
-
-  }*/
 }
 
 resource "azurerm_storage_account" "sa" {
@@ -40,25 +32,24 @@ resource "azurerm_storage_account" "sa" {
   location                 = azurerm_resource_group.rg.location
   account_tier             = "Standard"
   account_replication_type = "LRS"
-  #primary_access_key = azurerm_storage_account.primary_key
 }
 
 resource "azurerm_storage_container" "ev" {
   name                  = "eventos"
   storage_account_name  = azurerm_storage_account.sa.name
-  container_access_type = "private"
+  container_access_type = "container"
 }
 
 resource "azurerm_storage_container" "prod" {
   name                  = "prod"
   storage_account_name  = azurerm_storage_account.sa.name
-  container_access_type = "private"
+  container_access_type = "container"
 }
 
 resource "azurerm_storage_container" "dev" {
   name                  = "dev"
   storage_account_name  = azurerm_storage_account.sa.name
-  container_access_type = "private"
+  container_access_type = "container"
 }
 
 resource "azurerm_stream_analytics_job" "asa" {
@@ -73,12 +64,11 @@ resource "azurerm_stream_analytics_job" "asa" {
   output_error_policy                      = "Drop"
   streaming_units                          = 3
 
-
-
   transformation_query = <<QUERY
     SELECT *
-    INTO [${azurerm_storage_container.prod.name}]
-    FROM [${azurerm_iothub.iothub.name}]
+    INTO [${prodbs.name}]
+    FROM [${prodiothub.name}]
+    WHERE environment = true
 QUERY
 }
 
@@ -127,8 +117,6 @@ resource "azurerm_stream_analytics_job" "asa2" {
   events_out_of_order_policy               = "Adjust"
   output_error_policy                      = "Drop"
   streaming_units                          = 3
-
-
 
   transformation_query = <<QUERY
     SELECT *
