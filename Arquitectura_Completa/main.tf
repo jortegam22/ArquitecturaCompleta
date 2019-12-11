@@ -66,8 +66,8 @@ resource "azurerm_stream_analytics_job" "asa" {
 
   transformation_query = <<QUERY
     SELECT *
-    INTO [${azurerm_stream_analytics_output_blob_prodbs.name}]
-    FROM [${azurerm_stream_analytics_stream_input_iothub_prodiothub.name}]
+    INTO [${azurerm_storage_container.prod.name}]
+    FROM [${azurerm_iothub.iothub.name}]
     WHERE environment = true
 QUERY
 }
