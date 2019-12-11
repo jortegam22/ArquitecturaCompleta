@@ -146,10 +146,10 @@ resource "azurerm_stream_analytics_job" "asa2" {
   transformation_query = <<QUERY  
   WITH Eventos AS (
     SELECT *
-    FROM ${azurerm_stream_analytics_stream_input_iothub.deviothub.name}
+    FROM iothub
   )
     SELECT *
-    INTO [${azurerm_stream_analytics_output_blob.devbs.name}]
+    INTO blobstorage
     FROM Eventos
     WHERE environment == false and eventType == "Error"
   QUERY
