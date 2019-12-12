@@ -21,25 +21,13 @@ resource "azurerm_iothub" "iothub" {
     endpoint_names = ["datosiot"]
     enabled        = true
   }
-}
 
-resource "azurerm_iothub" "iothub" {
-  name                = "eventiothub"
-  resource_group_name = azurerm_resource_group.rg.name
-  location            = azurerm_resource_group.rg.location
-  
-  sku {
-    name     = "F1"
-    tier     = "Standard"
-    capacity = "1"
-  }
-
-  route {
-      name           = "storage"
-      source         = "DeviceMessages"
-      condition      = "true"
-      endpoint_names = ["datos"]
-      enabled        = true
+  fallback_route {
+    name           = "storage"
+    source         = "DeviceMessages"
+    condition      = "true"
+    endpoint_names = ["datos"]
+    enabled        = true
   }
 }
 
