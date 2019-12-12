@@ -13,16 +13,8 @@ resource "azurerm_iothub" "iothub" {
     tier     = "Standard"
     capacity = "1"
   }
-
-    route {
-    name           = "eventos"
-    source         = "DeviceMessages"
-    condition      = "true"
-    endpoint_names = ["eventos"]
-    enabled        = true
-  }
-
-    route {
+  
+  route {
     name           = "asa"
     source         = "DeviceMessages"
     condition      = "true"
