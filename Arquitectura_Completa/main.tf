@@ -26,7 +26,7 @@ resource "azurerm_iothub" "iothub" {
 resource "azurerm_iothub_endpoint_storage_container" "ihe" {
   resource_group_name = azurerm_resource_group.rg.name
   iothub_name         = azurerm_iothub.iothub.name
-  name                = "eventos"
+  name                = "datos"
 
   container_name    = azurerm_storage_container.ev.name 
   connection_string = azurerm_storage_account.sa.primary_blob_connection_string
@@ -85,7 +85,7 @@ resource "azurerm_stream_analytics_job" "asa" {
     SELECT *
     INTO blobstorage
     FROM Eventos
-    WHERE environment = true and eventType = 'Error'
+    WHERE environment = 1 and eventType = 'Error'
   QUERY
 }
 
@@ -143,7 +143,7 @@ resource "azurerm_stream_analytics_job" "asa2" {
     SELECT *
     INTO blobstorage
     FROM Eventos
-    WHERE environment = false and eventType = 'Error'
+    WHERE environment = 0 and eventType = 'Error'
   QUERY
 }
 
