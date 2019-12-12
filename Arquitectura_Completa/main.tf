@@ -21,6 +21,14 @@ resource "azurerm_iothub" "iothub" {
     endpoint_names = ["events"]
     enabled        = true
   }
+
+  route {
+    name           = "datosiot"
+    source         = "DeviceMessages"
+    condition      = "true"
+    endpoint_names = ["datos"]
+    enabled        = true
+  }
 }
 
 resource "azurerm_iothub_endpoint_storage_container" "ihe" {
