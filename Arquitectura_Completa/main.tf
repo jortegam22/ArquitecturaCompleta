@@ -14,13 +14,13 @@ resource "azurerm_iothub" "iothub" {
     capacity = "1"
   }
 
-  route {
+  /*route {
     name           = "asa"
     source         = "DeviceMessages"
     condition      = "true"
     endpoint_names = ["events"]
     enabled        = true
-  }
+  }*/
 
   route {
     name           = "datosiot"
