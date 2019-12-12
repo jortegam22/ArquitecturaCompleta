@@ -23,10 +23,10 @@ resource "azurerm_iothub" "iothub" {
   }*/
 
   route {
-    name           = "datosiot"
+    name           = "datos"
     source         = "DeviceMessages"
     condition      = "true"
-    endpoint_names = ["datos"]
+    endpoint_names = ["datosiot"]
     enabled        = true
   }
 }
