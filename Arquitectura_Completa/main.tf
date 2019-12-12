@@ -125,7 +125,7 @@ resource "azurerm_stream_analytics_output_blob" "prodbs" {
   time_format               = "HH"
 
   serialization {
-    type            = "JSON"
+    type            = "Json"
     encoding        = "UTF8"
     field_delimiter = " "
   }
@@ -183,7 +183,7 @@ resource "azurerm_stream_analytics_output_blob" "devbs" {
   time_format               = "HH"
 
   serialization {
-    type            = "JSON"
+    type            = "Json"
     encoding        = "UTF8"
     field_delimiter = " "
   }
