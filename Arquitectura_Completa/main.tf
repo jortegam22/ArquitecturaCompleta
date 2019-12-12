@@ -15,17 +15,22 @@ resource "azurerm_iothub" "iothub" {
   }
 
   route {
-    name           = "asa"
-    source         = "DeviceMessages"
-    condition      = "true"
-    endpoint_names = ["events"]
-    enabled        = true,
-
-    name           = "storage"
-    source         = "DeviceMessages"
-    condition      = "true"
-    endpoint_names = ["datos"]
-    enabled        = true
+    [
+      {
+        name           = "asa",
+        source         = "DeviceMessages",
+        condition      = "true",
+        endpoint_names = ["events"],
+        enabled        = true
+      },
+      {
+        name           = "storage",
+        source         = "DeviceMessages",
+        condition      = "true",
+        endpoint_names = ["datos"],
+        enabled        = true
+      }
+    ]
   }
 }
 
