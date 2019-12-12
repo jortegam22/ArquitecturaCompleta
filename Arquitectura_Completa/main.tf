@@ -18,7 +18,7 @@ resource "azurerm_iothub" "iothub" {
     name           = "eventos"
     source         = "DeviceMessages"
     condition      = "true"
-    endpoint_names = ["export"]
+    endpoint_names = ["eventos"]
     enabled        = true
   }
 
@@ -34,7 +34,7 @@ resource "azurerm_iothub" "iothub" {
 resource "azurerm_iothub_endpoint_storage_container" "ihe" {
   resource_group_name = azurerm_resource_group.rg.name
   iothub_name         = azurerm_iothub.iothub.name
-  name                = "export"
+  name                = "eventos"
 
   container_name    = azurerm_storage_container.ev.name 
   connection_string = azurerm_storage_account.sa.primary_blob_connection_string
