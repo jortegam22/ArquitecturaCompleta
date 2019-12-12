@@ -26,7 +26,7 @@ resource "azurerm_iothub" "iothub" {
 resource "azurerm_iothub_endpoint_storage_container" "ihe" {
   resource_group_name = azurerm_resource_group.rg.name
   iothub_name         = azurerm_iothub.iothub.name
-  name                = "datos"
+  name                = "datosiot"
 
   container_name    = azurerm_storage_container.ev.name 
   connection_string = azurerm_storage_account.sa.primary_blob_connection_string
@@ -48,7 +48,7 @@ resource "azurerm_storage_account" "sa" {
 }
 
 resource "azurerm_storage_container" "ev" {
-  name                  = "eventos"
+  name                  = "datos"
   storage_account_name  = azurerm_storage_account.sa.name
   container_access_type = "container"
 }
@@ -112,7 +112,7 @@ resource "azurerm_stream_analytics_output_blob" "prodbs" {
   storage_account_name      = azurerm_storage_account.sa.name
   storage_account_key       = azurerm_storage_account.sa.primary_access_key
   storage_container_name    = azurerm_storage_container.prod.name
-  path_pattern              = "events"
+  path_pattern              = "datos"
   date_format               = "yyyy-MM-dd"
   time_format               = "HH"
 
@@ -170,7 +170,7 @@ resource "azurerm_stream_analytics_output_blob" "devbs" {
   storage_account_name      = azurerm_storage_account.sa.name
   storage_account_key       = azurerm_storage_account.sa.primary_access_key
   storage_container_name    = azurerm_storage_container.dev.name
-  path_pattern              = "events"
+  path_pattern              = "datos"
   date_format               = "yyyy-MM-dd"
   time_format               = "HH"
 
