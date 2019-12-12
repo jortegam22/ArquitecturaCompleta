@@ -127,7 +127,7 @@ resource "azurerm_stream_analytics_output_blob" "prodbs" {
   serialization {
     type            = "Json"
     encoding        = "UTF8"
-    field_delimiter = " "
+    field_delimiter = ","
   }
 }
 
@@ -185,6 +185,6 @@ resource "azurerm_stream_analytics_output_blob" "devbs" {
   serialization {
     type            = "Json"
     encoding        = "UTF8"
-    field_delimiter = " "
+    field_delimiter = ","
   }
 }
