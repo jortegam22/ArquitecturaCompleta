@@ -14,19 +14,17 @@ resource "azurerm_iothub" "iothub" {
     capacity = "1"
   }
 
-  /*route {
+  route {
     name           = "asa"
     source         = "DeviceMessages"
     condition      = "true"
     endpoint_names = ["events"]
-    enabled        = true
-  }*/
+    enabled        = true,
 
-  route {
-    name           = "datos"
+    name           = "storage"
     source         = "DeviceMessages"
     condition      = "true"
-    endpoint_names = ["datosiot"]
+    endpoint_names = ["datos"]
     enabled        = true
   }
 }
@@ -44,8 +42,6 @@ resource "azurerm_iothub_endpoint_storage_container" "ihe" {
   max_chunk_size_in_bytes    = 10485760
   encoding                   = "JSON"
 }
-
-
 
 resource "azurerm_storage_account" "sa" {
   name                     = "prodsa"
