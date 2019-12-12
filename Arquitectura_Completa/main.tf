@@ -20,7 +20,6 @@ resource "azurerm_iothub" "iothub" {
     condition      = "true"
     endpoint_names = ["datosiot"]
     enabled        = true
-    }
   }
 }
 
@@ -36,13 +35,11 @@ resource "azurerm_iothub" "iothub" {
   }
 
   route {
-    {
       name           = "storage"
       source         = "DeviceMessages"
       condition      = "true"
       endpoint_names = ["datos"]
       enabled        = true
-    }
   }
 }
 
