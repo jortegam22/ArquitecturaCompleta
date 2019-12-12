@@ -96,7 +96,7 @@ resource "azurerm_stream_analytics_stream_input_iothub" "prodiothub" {
   endpoint                     = "messages/events"
   eventhub_consumer_group_name = "$Default"
   iothub_namespace             = azurerm_iothub.iothub.name
-  shared_access_policy_key     = azurerm_iothub.iothub.shared_access_policy.1.primary_key
+  shared_access_policy_key     = azurerm_iothub.iothub.shared_access_policy.0.primary_key
   shared_access_policy_name    = "iothubowner"
 
   serialization {
@@ -154,7 +154,7 @@ resource "azurerm_stream_analytics_stream_input_iothub" "deviothub" {
   endpoint                     = "messages/events"
   eventhub_consumer_group_name = "$Default"
   iothub_namespace             = azurerm_iothub.iothub.name
-  shared_access_policy_key     = azurerm_iothub.iothub.shared_access_policy.1.primary_key
+  shared_access_policy_key     = azurerm_iothub.iothub.shared_access_policy.0.primary_key
   shared_access_policy_name    = "iothubowner"
 
   serialization {
