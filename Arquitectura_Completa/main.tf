@@ -18,7 +18,7 @@ resource "azurerm_iothub" "iothub" {
     capacity = "1"
   }
 
-endpoint {
+/*endpoint {
     type                       = "AzureIotHub.StorageContainer"
     connection_string          = azurerm_storage_account.sa.primary_blob_connection_string
     name                       = "datosiot"
@@ -35,7 +35,7 @@ endpoint {
     condition      = "true"
     endpoint_names = ["datosiot"]
     enabled        = true
-  }
+  }*/
 }
 
 resource "azurerm_iothub_endpoint_eventhub" "eventhubep" {
@@ -122,6 +122,11 @@ resource "azurerm_stream_analytics_job" "asa" {
     SELECT *
     FROM iothub
   )
+
+    SELECT *
+    INTO blobstorage2
+    FROM Eventos
+
     SELECT *
     INTO blobstorage
     FROM Eventos
@@ -159,6 +164,24 @@ resource "azurerm_stream_analytics_output_blob" "prodbs" {
   storage_account_name      = azurerm_storage_account.sa.name
   storage_account_key       = azurerm_storage_account.sa.primary_access_key
   storage_container_name    = azurerm_storage_container.prod.name
+  path_pattern              = "datos"
+  date_format               = "yyyy-MM-dd"
+  time_format               = "HH"
+
+  serialization {
+    type            = "Json"
+    encoding        = "UTF8"
+    format          = "LineSeparated"
+  }
+}
+
+resource "azurerm_stream_analytics_output_blob" "prodbs2" {
+  name                      = "blobstorage2"
+  stream_analytics_job_name = azurerm_stream_analytics_job.asa.name
+  resource_group_name       = azurerm_resource_group.rg.name
+  storage_account_name      = azurerm_storage_account.sa.name
+  storage_account_key       = azurerm_storage_account.sa.primary_access_key
+  storage_container_name    = azurerm_storage_container.ev.name
   path_pattern              = "datos"
   date_format               = "yyyy-MM-dd"
   time_format               = "HH"
