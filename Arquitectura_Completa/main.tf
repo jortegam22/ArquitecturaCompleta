@@ -30,7 +30,7 @@ resource "azurerm_iothub" "iothub" {
 resource "azurerm_iothub_endpoint_storage_container" "storageep" {
   resource_group_name = azurerm_resource_group.rg.name
   iothub_name         = azurerm_iothub.iothub.name
-  name                = "storageep"
+  name                = "datosiot"
 
   container_name    = azurerm_storage_container.ev.name 
   connection_string = azurerm_storage_account.sa.primary_blob_connection_string
