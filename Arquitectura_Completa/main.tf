@@ -18,6 +18,17 @@ resource "azurerm_iothub" "iothub" {
     capacity = "1"
   }
 
+endpoint {
+    type                       = "AzureIotHub.StorageContainer"
+    connection_string          = azurerm_storage_account.sa.primary_blob_connection_string
+    name                       = "datosiot"
+    batch_frequency_in_seconds = 60
+    max_chunk_size_in_bytes    = 10485760
+    container_name             = azurerm_storage_container.ev.name 
+    encoding                   = "Json"
+    file_name_format           = "{iothub}/{partition}_{YYYY}_{MM}_{DD}_{HH}_{mm}"
+  }
+
   route {
     name           = "storage"
     source         = "DeviceMessages"
@@ -25,20 +36,6 @@ resource "azurerm_iothub" "iothub" {
     endpoint_names = ["datosiot"]
     enabled        = true
   }
-}
-
-resource "azurerm_iothub_endpoint_storage_container" "storageep" {
-  resource_group_name = azurerm_resource_group.rg.name
-  iothub_name         = azurerm_iothub.iothub.name
-  name                = "datosiot"
-
-  container_name    = azurerm_storage_container.ev.name 
-  connection_string = azurerm_storage_account.sa.primary_blob_connection_string
-
-  file_name_format           = "{iothub}/{partition}_{YYYY}_{MM}_{DD}_{HH}_{mm}"
-  batch_frequency_in_seconds = 60
-  max_chunk_size_in_bytes    = 10485760
-  encoding                   = "JSON"
 }
 
 resource "azurerm_iothub_endpoint_eventhub" "eventhubep" {
