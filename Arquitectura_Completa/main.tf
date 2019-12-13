@@ -22,7 +22,7 @@ resource "azurerm_iothub" "iothub" {
     name           = "storage"
     source         = "DeviceMessages"
     condition      = "true"
-    endpoint_names = ["datos"]
+    endpoint_names = ["datosiot"]
     enabled        = true
   }
 }
@@ -55,7 +55,7 @@ resource "azurerm_eventhub_namespace" "datosns" {
   name                = "datoseh"
   location            = azurerm_resource_group.rg.location
   resource_group_name = azurerm_resource_group.rg.name
-  sku                 = "Basic"
+  sku                 = "Standar"
 }
 
 resource "azurerm_eventhub" "datoseh" {
