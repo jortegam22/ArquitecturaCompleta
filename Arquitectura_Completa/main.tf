@@ -218,6 +218,7 @@ resource "azurerm_stream_analytics_stream_input_eventhub" "asaevent" {
     type     = "Json"
     encoding = "UTF8"
   }
+}
 
 resource "azurerm_stream_analytics_output_blob" "devbs" {
   name                      = "blobstorage"
