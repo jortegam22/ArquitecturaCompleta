@@ -1,7 +1,11 @@
+//Resource Group Configuration
+
 resource "azurerm_resource_group" "rg" {
   name     = var.resource_group_name
   location = var.resource_group_location
 }
+
+//IoTHub Configuration
 
 resource "azurerm_iothub" "iothub" {
   name                = "eventiothub"
@@ -15,14 +19,6 @@ resource "azurerm_iothub" "iothub" {
   }
 
   route {
-    name           = "datos"
-    source         = "DeviceMessages"
-    condition      = "true"
-    endpoint_names = ["datosiot"]
-    enabled        = true
-  }
-
-  fallback_route {
     name           = "storage"
     source         = "DeviceMessages"
     condition      = "true"
@@ -31,10 +27,10 @@ resource "azurerm_iothub" "iothub" {
   }
 }
 
-resource "azurerm_iothub_endpoint_storage_container" "ihe" {
+resource "azurerm_iothub_endpoint_storage_container" "storageep" {
   resource_group_name = azurerm_resource_group.rg.name
   iothub_name         = azurerm_iothub.iothub.name
-  name                = "datosiot"
+  name                = "storageep"
 
   container_name    = azurerm_storage_container.ev.name 
   connection_string = azurerm_storage_account.sa.primary_blob_connection_string
@@ -44,6 +40,44 @@ resource "azurerm_iothub_endpoint_storage_container" "ihe" {
   max_chunk_size_in_bytes    = 10485760
   encoding                   = "JSON"
 }
+
+resource "azurerm_iothub_endpoint_eventhub" "eventhubep" {
+  resource_group_name = azurerm_resource_group.rg.name
+  iothub_name         = azurerm_iothub.iothub.name
+  name                = "eventhubep"
+
+  connection_string = azurerm_eventhub_authorization_rule.datosaur.primary_connection_string
+}
+
+//EventHub Configuration
+
+resource "azurerm_eventhub_namespace" "datosns" {
+  name                = "datoseh"
+  location            = azurerm_resource_group.rg.location
+  resource_group_name = azurerm_resource_group.rg.name
+  sku                 = "Basic"
+}
+
+resource "azurerm_eventhub" "datoseh" {
+  name                = "datoseh"
+  location            = azurerm_resource_group.rg.location
+  resource_group_name = azurerm_resource_group.rg.name
+  partition_count     = 2
+  message_retention   = 1
+}
+
+resource "azurerm_eventhub_authorization_rule" "datosaur" {
+  name                = "datosaur"
+  namespace_name      = azurerm_eventhub_namespace.datosns.name
+  eventhub_name       = azurerm_eventhub.datoseh.name
+  resource_group_name = azurerm_resource_group.rg.name
+
+  listen = true
+  send   = false
+  manage = false
+}
+
+//Storage Account and Containers Configuration
 
 resource "azurerm_storage_account" "sa" {
   name                     = "prodsa"
@@ -71,6 +105,8 @@ resource "azurerm_storage_container" "dev" {
   container_access_type = "container"
 }
 
+//prodASA Configuration
+
 resource "azurerm_stream_analytics_job" "asa" {
   name                                     = "prodASA"
   resource_group_name                      = azurerm_resource_group.rg.name
@@ -95,21 +131,27 @@ resource "azurerm_stream_analytics_job" "asa" {
   QUERY
 }
 
-resource "azurerm_stream_analytics_stream_input_iothub" "prodiothub" {
-  name                         = "iothub"
+resource "azurerm_eventhub_consumer_group" "cg" {
+  name                = "proddatoscg"
+  namespace_name      = azurerm_eventhub_namespace.datosns.name
+  eventhub_name       = azurerm_eventhub.datoseh.name
+  resource_group_name = azurerm_resource_group.rg.name
+}
+
+resource "azurerm_stream_analytics_stream_input_eventhub" "asaevent" {
+  name                         = "eventhub"
   stream_analytics_job_name    = azurerm_stream_analytics_job.asa.name
   resource_group_name          = azurerm_resource_group.rg.name
-  endpoint                     = "messages/events"
-  eventhub_consumer_group_name = "$Default"
-  iothub_namespace             = azurerm_iothub.iothub.name
-  shared_access_policy_key     = azurerm_iothub.iothub.shared_access_policy.0.primary_key
-  shared_access_policy_name    = "iothubowner"
+  eventhub_consumer_group_name = azurerm_eventhub_consumer_group.cg.name
+  eventhub_name                = azurerm_eventhub.datoseh.name
+  servicebus_namespace         = azurerm_eventhub_namespace.datosns.name
+  shared_access_policy_key     = azurerm_eventhub_namespace.datosns.default_primary_key
+  shared_access_policy_name    = "RootManageSharedAccessKey"
 
   serialization {
     type     = "Json"
     encoding = "UTF8"
   }
-}
 
 resource "azurerm_stream_analytics_output_blob" "prodbs" {
   name                      = "blobstorage"
@@ -129,6 +171,8 @@ resource "azurerm_stream_analytics_output_blob" "prodbs" {
   }
 }
 
+//devASA Configuration
+
 resource "azurerm_stream_analytics_job" "asa2" {
   name                                     = "devASA"
   resource_group_name                      = azurerm_resource_group.rg.name
@@ -144,7 +188,7 @@ resource "azurerm_stream_analytics_job" "asa2" {
   transformation_query = <<QUERY
   WITH Eventos AS (
     SELECT *
-    FROM iothub
+    FROM eventhub
   )
     SELECT *
     INTO blobstorage
@@ -153,21 +197,27 @@ resource "azurerm_stream_analytics_job" "asa2" {
   QUERY
 }
 
-resource "azurerm_stream_analytics_stream_input_iothub" "deviothub" {
-  name                         = "iothub"
+resource "azurerm_eventhub_consumer_group" "cg" {
+  name                = "devdatoscg"
+  namespace_name      = azurerm_eventhub_namespace.datosns.name
+  eventhub_name       = azurerm_eventhub.datoseh.name
+  resource_group_name = azurerm_resource_group.rg.name
+}
+
+resource "azurerm_stream_analytics_stream_input_eventhub" "asaevent" {
+  name                         = "eventhub"
   stream_analytics_job_name    = azurerm_stream_analytics_job.asa2.name
   resource_group_name          = azurerm_resource_group.rg.name
-  endpoint                     = "messages/events"
-  eventhub_consumer_group_name = "$Default"
-  iothub_namespace             = azurerm_iothub.iothub.name
-  shared_access_policy_key     = azurerm_iothub.iothub.shared_access_policy.0.primary_key
-  shared_access_policy_name    = "iothubowner"
+  eventhub_consumer_group_name = azurerm_eventhub_consumer_group.cg.name
+  eventhub_name                = azurerm_eventhub.datoseh.name
+  servicebus_namespace         = azurerm_eventhub_namespace.datosns.name
+  shared_access_policy_key     = azurerm_eventhub_namespace.datosns.default_primary_key
+  shared_access_policy_name    = "RootManageSharedAccessKey"
 
   serialization {
     type     = "Json"
     encoding = "UTF8"
   }
-}
 
 resource "azurerm_stream_analytics_output_blob" "devbs" {
   name                      = "blobstorage"
