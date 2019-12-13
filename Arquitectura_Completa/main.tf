@@ -60,6 +60,7 @@ resource "azurerm_eventhub_namespace" "datosns" {
 
 resource "azurerm_eventhub" "datoseh" {
   name                = "datoseh"
+  namespace_name      = azurerm_eventhub_namespace.datosns.name
   location            = azurerm_resource_group.rg.location
   resource_group_name = azurerm_resource_group.rg.name
   partition_count     = 2
