@@ -198,7 +198,7 @@ resource "azurerm_stream_analytics_job" "asa2" {
   QUERY
 }
 
-resource "azurerm_eventhub_consumer_group" "cg" {
+resource "azurerm_eventhub_consumer_group" "cg2" {
   name                = "devdatoscg"
   namespace_name      = azurerm_eventhub_namespace.datosns.name
   eventhub_name       = azurerm_eventhub.datoseh.name
@@ -209,7 +209,7 @@ resource "azurerm_stream_analytics_stream_input_eventhub" "asaevent2" {
   name                         = "eventhub"
   stream_analytics_job_name    = azurerm_stream_analytics_job.asa2.name
   resource_group_name          = azurerm_resource_group.rg.name
-  eventhub_consumer_group_name = azurerm_eventhub_consumer_group.cg.name
+  eventhub_consumer_group_name = azurerm_eventhub_consumer_group.cg2.name
   eventhub_name                = azurerm_eventhub.datoseh.name
   servicebus_namespace         = azurerm_eventhub_namespace.datosns.name
   shared_access_policy_key     = azurerm_eventhub_namespace.datosns.default_primary_key
