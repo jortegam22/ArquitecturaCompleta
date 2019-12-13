@@ -152,6 +152,7 @@ resource "azurerm_stream_analytics_stream_input_eventhub" "asaevent" {
     type     = "Json"
     encoding = "UTF8"
   }
+}
 
 resource "azurerm_stream_analytics_output_blob" "prodbs" {
   name                      = "blobstorage"
@@ -204,7 +205,7 @@ resource "azurerm_eventhub_consumer_group" "cg" {
   resource_group_name = azurerm_resource_group.rg.name
 }
 
-resource "azurerm_stream_analytics_stream_input_eventhub" "asaevent" {
+resource "azurerm_stream_analytics_stream_input_eventhub" "asaevent2" {
   name                         = "eventhub"
   stream_analytics_job_name    = azurerm_stream_analytics_job.asa2.name
   resource_group_name          = azurerm_resource_group.rg.name
