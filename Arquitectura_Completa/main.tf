@@ -22,7 +22,7 @@ resource "azurerm_iothub" "iothub" {
     name           = "storage"
     source         = "DeviceMessages"
     condition      = "true"
-    endpoint_names = "datosiot"
+    endpoint_names = ["datosiot"]
     enabled        = true
   }
 }
