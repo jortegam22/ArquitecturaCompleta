@@ -5,3 +5,7 @@ variable "resource_group_name" {
 variable "resource_group_location" {
   default = "West Europe"
 }
+
+variable "azurerm_iothub_endpoint_storage_container.storageep.name"{
+  default = "datosiot"
+}
