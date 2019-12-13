@@ -18,10 +18,10 @@ resource "azurerm_iothub" "iothub" {
     capacity = "1"
   }
 
-/*endpoint {
-    type                       = "AzureIotHub.StorageContainer"
-    connection_string          = azurerm_storage_account.sa.primary_blob_connection_string
-    name                       = "datosiot"
+endpoint {
+    type                       = "AzureIotHub.EventHub"
+    connection_string          = azurerm_eventhub_authorization_rule.datosaur.primary_connection_string
+    name                       = "eventhubep"
     batch_frequency_in_seconds = 60
     max_chunk_size_in_bytes    = 10485760
     container_name             = azurerm_storage_container.ev.name 
@@ -30,21 +30,21 @@ resource "azurerm_iothub" "iothub" {
   }
 
   route {
-    name           = "storage"
+    name           = "eventhubep"
     source         = "DeviceMessages"
     condition      = "true"
-    endpoint_names = ["datosiot"]
+    endpoint_names = ["eventhubep"]
     enabled        = true
-  }*/
+  }
 }
 
-resource "azurerm_iothub_endpoint_eventhub" "eventhubep" {
+/*resource "azurerm_iothub_endpoint_eventhub" "eventhubep" {
   resource_group_name = azurerm_resource_group.rg.name
   iothub_name         = azurerm_iothub.iothub.name
   name                = "eventhubep"
 
   connection_string = azurerm_eventhub_authorization_rule.datosaur.primary_connection_string
-}
+}*/
 
 //EventHub Configuration
 
@@ -120,7 +120,7 @@ resource "azurerm_stream_analytics_job" "asa" {
   transformation_query = <<QUERY
   WITH Eventos AS (
     SELECT *
-    FROM iothub
+    FROM eventhub
   )
 
     SELECT *
