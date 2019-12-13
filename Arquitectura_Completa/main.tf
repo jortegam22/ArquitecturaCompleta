@@ -22,7 +22,7 @@ resource "azurerm_iothub" "iothub" {
     name           = "storage"
     source         = "DeviceMessages"
     condition      = "true"
-    endpoint_names = ["export"]
+    endpoint_names = ["storageep"]
     enabled        = true
   }
 }
